@@ -1,0 +1,197 @@
+C'est parti ! Il est presque 17h, donc je vais aller droit au but pour que tu puisses copier-coller ça dans ton notebook Jupyter (SageMath).Tu dois nommer ton fichier : prenom.nom-TP2.ipynb1.Voici le code et les explications exercice par exercice, en "mode étudiant" (clair et direct).Exercice 1 : Bases et produits matricielsIci, on définit les matrices et le vecteur avec la variable $x$. On teste les produits possibles (attention aux dimensions).Python# --- EXERCICE 1 ---
+
+# Définition des matrices et vecteurs
+# On n'oublie pas de déclarer la variable x pour le vecteur u
+var('x')
+
+A = matrix([[1, 2, 3],
+            [-1, 0, 1],
+            [0, 1, 0]])
+
+B = matrix([[2, -1, 0],
+            [-1, 0, 1]])
+
+u = matrix([[1],
+            [x],
+            [x^2]]) # Vecteur colonne
+
+v = matrix([[1],
+            [0],
+            [1]])   # Vecteur colonne
+
+print("--- Question 1 : Produits possibles ---")
+# On ne peut multiplier M1 * M2 que si le nombre de colonnes de M1 = nombre de lignes de M2
+
+try:
+    print("A * v =")
+    print(A * v)
+except:
+    print("A * v impossible")
+
+try:
+    print("\nB * A =")
+    print(B * A)
+except:
+    print("B * A impossible")
+
+try:
+    print("\nB * v =")
+    print(B * v)
+except:
+    print("B * v impossible")
+
+# Note : A * B est impossible (3x3 * 2x3)
+# B * u est possible mathématiquement si x est défini, Sage le gère symboliquement
+print("\nB * u =")
+print(B * u)
+
+
+print("\n--- Question 2 : (A - I)^T et extraction ---")
+I3 = identity_matrix(3)
+M_res = (A - I3).transpose()
+print("Matrice résultat :")
+print(M_res)
+# Extraction coefficient (2,3). Attention en Python/Sage les indices commencent à 0.
+# Donc ligne 2 = index 1, colonne 3 = index 2.
+# MAIS l'énoncé demande souvent la position mathématique.
+# Si on suit la logique informatique 0-indexée : A[1, 2]
+print("Coefficient en position (2,3) [index 1,2] :", M_res[1, 2])
+
+
+print("\n--- Question 3 : Inverse de A et Trace ---")
+A_inv = A.inverse()
+print("Inverse de A :")
+print(A_inv)
+print("Trace de l'inverse :", A_inv.trace())
+Exercice 2 : CommutativitéLe but ici est de montrer que l'identité remarquable $(A+B)^2 = A^2 + 2AB + B^2$ est fausse si les matrices ne commutent pas (c'est-à-dire si $AB \neq BA$)2.Python# --- EXERCICE 2 ---
+
+print("--- Question 1 : A et B ---")
+A = matrix([[2, -1, -1, -2],
+            [4, 4, 2, 0],
+            [0, 4, -2, 0],
+            [-1, -1, 0, -3]])
+
+B = matrix([[-2, 2, 1, -3],
+            [1, -3, 0, -2],
+            [2, -1, -2, 3],
+            [-4, 3, 3, 3]])
+
+# Calculs
+calc1 = (A + B)^2
+calc2 = A^2 + 2*A*B + B^2
+
+print("(A + B)^2 =")
+print(calc1)
+print("\nA^2 + 2AB + B^2 =")
+print(calc2)
+
+# Test d'égalité
+if calc1 == calc2:
+    print("Conclusion : Les résultats sont identiques.")
+else:
+    print("Conclusion : Les résultats sont différents car A et B ne commutent pas (AB != BA).")
+
+
+print("\n--- Question 2 : C et D ---")
+C = matrix([[0, -4, 3, 1],
+            [4, 2, -4, 1],
+            [1, -1, 3, 3],
+            [4, 1, 4, -4]])
+
+D = matrix([[-8, -6, 26, 0],
+            [4, -8, 0, -11],
+            [10, -5, 26, -6],
+            [-12, -23, 0, 38]])
+
+calc3 = (C + D)^2
+calc4 = C^2 + 2*C*D + D^2
+
+if calc3 == calc4:
+    print("Pour C et D, les résultats sont identiques. Cela signifie que C et D commutent (CD = DC).")
+else:
+    print("Les résultats sont différents.")
+
+
+Exercice 3 : Polynôme annulateur et inverseOn utilise une matrice $M$ d'ordre 33. On va trouver une relation avec l'identité pour déduire l'inverse.Python# --- EXERCICE 3 ---
+
+M = matrix([[-5, -5, 2],
+            [6, 8, -4],
+            [6, 5, -1]])
+I3 = identity_matrix(3)
+
+print("--- Question 1 : Calcul du polynôme ---")
+res = M^3 - 2*M^2 - 5*M
+print("M^3 - 2M^2 - 5M =")
+print(res)
+
+# Tu devrais voir une matrice diagonale, par exemple 6*I
+# Si le résultat est bien 6*I, tu peux écrire dans une cellule Markdown :
+# "On remarque que le résultat est 6 * I3"
+
+print("\n--- Question 2 : Déduction de l'inverse ---")
+# Si M^3 - 2M^2 - 5M = 6*I
+# Alors M * (M^2 - 2M - 5I) = 6*I
+# Donc M * [ (1/6) * (M^2 - 2M - 5I) ] = I
+# L'inverse N est donc (1/6)*(M^2 - 2M - 5I)
+
+N = (1/6) * (M^2 - 2*M - 5*I3)
+print("Inverse déduit N :")
+print(N)
+
+print("\n--- Question 3 : Vérification ---")
+print("Inverse calculé par Sage (M^-1) :")
+print(M.inverse())
+
+# Vérif
+print("Est-ce que N == M.inverse() ?", N == M.inverse())
+Exercice 4 : Matrices binaires (Modulo 2)Attention : C'est le point clé de ce TP. Il faut définir l'anneau de base comme GF(2) (le corps à 2 éléments : 0 et 1)4.Python# --- EXERCICE 4 ---
+
+# Définition de la matrice dans le corps GF(2) (Modulo 2)
+# Z/2Z se note GF(2) sous Sage
+
+
+m = matrix(GF(2), [[1, 1, 1, 0],
+                   [1, 0, 1, 1],
+                   [1, 0, 0, 1],
+                   [1, 1, 1, 1]])
+
+print("--- Question 1 : Puissances ---")
+print("m^2 =")
+print(m^2)
+print("m^4 =")
+print(m^4)
+# En déduire m^6 : c'est m^4 * m^2
+print("m^6 (calculé par m^4 * m^2) =")
+print(m^4 * m^2)
+
+
+print("\n--- Question 2 : m^37 ---")
+# Astuce : Regarde si m^6 ou une puissance proche ne donne pas l'identité ou ne cycle pas.
+# Sinon, Sage le calcule vite.
+print("m^37 =")
+print(m^37)
+
+
+print("\n--- Question 3 : m^3 et m^5 ---")
+print("m^3 =", m^3)
+print("m^5 =", m^5)
+
+
+print("\n--- Question 4 : Inverse ---")
+# Une matrice est inversible si son déterminant est non nul (donc 1 ici).
+try:
+    inv_m = m.inverse()
+    print("L'inverse de m est :")
+    print(inv_m)
+except:
+    print("m n'est pas inversible.")
+
+
+print("\n--- Question 5 : (I + m^2)^21 ---")
+I4 = identity_matrix(GF(2), 4) # Identité modulo 2
+res_complex = (I4 + m^2)^21
+print("(I + m^2)^21 =")
+print(res_complex)
+
+
+Conseil de dernière minute pour la rédactionCopie le code dans des cellules "Code".Entre chaque exercice, ajoute une petite cellule "Markdown" pour dire : "Voici les calculs pour l'exercice X" ou répondre aux questions textuelles (comme la conclusion de l'exercice 2).Pour déposer : Sauvegarde bien sous prenom.nom-TP2.ipynb et envoie sur AMETICE dans le dossier R1.07 TP25.Dépêche-toi, il te reste quelques minutes ! Courage !
