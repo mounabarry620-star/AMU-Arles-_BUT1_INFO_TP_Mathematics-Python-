@@ -1,0 +1,211 @@
+R2.09 TP 2
+
+Calcul formel vs calcul numérique
+19 mars 2026 – B. Colombel
+
+Un compte-rendu de ce TP (réponses aux exercices et aux questions) est à rédiger sur le notebook Jupyter et votre
+compte rendu doit être déposé sous le nom
+prenom.nom-TP2.ipynb
+dans le dossier relatif à ce TP sur Ametice (R2.09, TP2).
+Rappels. Pour effectuer du calcul algébrique avec sagemath, vous devez d’abord définir la ou les variables symboliques que vous utilisez (voir TP no 1 de R1.07). Par exemple :
+[1]:
+
+[2]:
+
+x, y = var('x, y')
+# on suppose que $y$ est une constante ; on cherche $x$
+solve(x**2 - 2*x*y + 1 == 0, x)
+# on suppose que $x$ est une constante ; on cherche $y$
+solve(x**2 - 2*x*y + 1 == 0, y)
+
+1
+
+Le calcul formel peut-il tout faire ?
+
+Le calcul formel ne résout malheureusement pas tous les problèmes de mathématique d’un coup de baguette magique !
+Exercice 1.
+1. On considère l’équation
+xk − x − 1 = 0 pour k ⩾ 2
+Quelle réponse donne sagemath lorsque k = 2, k = 3, k = 4 et k = 5 ?
+2. Est-ce que sagemath sait que toutes ces expressions sont nulles ?
+expr1 = 210 − 1024
+
+expr2 = (x + 1)2 − x2 − 2x − 1
+
+expr3 = sin2 x + cos2 x − 1
+
+Explications.
+1. La première limitation est propre aux mathématiques : on ne peut pas trouver une écriture explicite des solutions
+de toutes les équations.
+Pour k = 5, la commande solve(x^5-x-1==0, x) ne renvoie pas les solutions, mais il renvoie l’équation qui
+définit les solutions (ce qui ne nous avance guère). Ce n’est pas ici un problème de sagemath. En effet, il n’est
+mathématiquement pas possible d’exprimer la solution réelle de xk − x − 1 = 0.
+C’est seulement possible jusqu’à k = 4. Par contre on obtient une approximation de la solution réelle par la
+commande find_root(x^5-x-1==0,-1,2) en précisant que l’on cherche la solution sur l’intervalle [−1,2].
+2. (a) Sans problème 2^10 - 1024 renvoie 0 .
+(b) Il est nécessaire de développer pour trouver 0 : expand((x+1)^2-x^2-2*x-1) .
+(c) Il faut explicitement préciser de simplifier l’expression trigonométrique : d’abord
+f = sin(x)^2+cos(x)^2 - 1 puis on demande de simplifier f.simplify_trig() pour obtenir 0.
+Il n’est pas du tout évident pour un ordinateur de reconnaître les identités comme (a + b)2 = a2 + 2ab + b2
+ou bien cos2 (x) + sin2 (x) = 1. Souvenez-vous d’ailleurs qu’il faut plusieurs années d’apprentissage pour les
+assimiler.
+Lorsqu’il y a plusieurs écritures d’une même expression, il n’est pas non plus évident pour l’ordinateur de savoir
+quelle forme est la plus adaptée à l’utilisateur. Par exemple, selon le contexte, les trois écritures sont utiles :
+(a − b)3 = (a − b)(a2 − 2ab + b2 ) = a3 − 3a2 b + 3ab2 − b3 . Il faudra donc «guider» le logiciel de calcul formel
+avec les fonctions expand , factor , simplify , etc.
+Info1 — R2.09
+Année 2025/2026
+
+Outils fondamentaux
+
+page 1/4
+
+Exercice 2. Soit la suite récurrente définie par :
+(
+u0 = 1
+√
+un+1 = un + 1
+
+pour n ⩾ 0
+
+On cherche à observer le comportement de cette suite et en particulier à connaître son comportement lorsque n devient
+grand.
+1. Qu’obtient-on si on tape la commande suivante ?
+Le résultat est-il utile ?
+[10]:
+
+u = var('u')
+for i in range(4) :
+u = sqrt(u+1)
+print(u)
+
+2. Que donne le même programme en utilisant une variable numérique ? Quelles conjectures peut-on alors émettre
+(sens de variation, limite, . . .) ?
+3. La solution positive de l’équation x2 − x − 1 = 0 est connue sous le nom de « nombre d’or ». Déterminer, à
+l’aide de sagemath, sa valeur exacte (fonction solve() ) et sa valeur approchée.
+Conclure.
+Conclusion. La puissance du calcul symbolique, ne doit pas occulter les bénéfices du calcul numérique. Bien que
+non exact, le calcul numérique possède plusieurs avantages : il est plus rapide, souvent suffisant pour les applications
+pratiques et peut aussi être plus lisible.
+Suivant les problèmes que vous aurez à résoudre, vous aurez à jongler entre calcul formel et calcul numérique.
+À vous de voir ce qui est le plus approprié selon le contexte.
+
+2
+
+Calcul numérique
+
+2.1
+
+Calcul numérique pour expérimenter
+
+Comme nous l’avons vu, le calcul numérique est performant pour se faire une idée du comportement d’une suite. Mais
+il faut quand même se méfier quelquefois !
+Exercice 3. Soit la suite définie par
+n100
+100n
+1. Calculer les 10 premiers termes de la suite. Quelles conjectures peut-on faire sur son sens de variation ? sa
+limite ?
+un =
+
+2. Pour confirmer ou infirmer vos conjectures, tracer la courbe de la fonction à l’aide de laquelle on a défini la
+suite (un ).
+3. Conclure.
+
+2.2
+
+Des problèmes de calculs
+
+Vous savez qu’un nombre à virgule flottante (VF) correspond à une variable dont la valeur est un nombre réel, stocké
+en valeur approchée sous la forme d’un triplet (s,m,e) où :
+— s : bit de signe (1 ou −1) ;
+— m : matisse et
+— e : un exposant
+Un tel triplet représente le nombre :
+v = (−1)s × m × 2e
+La norme utilisé par sagemath est la norme IEEE 754 : le signe est codé sur 1 bit, l’exposant sur 11 bits et la mantisse
+sur 53 bits (soit 16 chiffres significatifs).
+Les calculs en virgule flottante sont pratiques mais présentent divers désagréments :
+Info1 — R2.09
+Année 2025/2026
+
+Outils fondamentaux
+
+page 2/4
+
+— leur précision limitée qui se traduit par des arrondis qui peuvent s’accumuler de manière génante ;
+— une plage d’exposant limitée pouvant donner lieu à des overflows ou underflows.
+Exemple 1. Regardons l’opération suivante :
+[16]:
+
+5 - 4.9 - 0.1
+
+[16]:
+
+-3.60822483003176e-16
+
+Cela semble indiquer que les flottants associés à 4,9 et 0,1 ne corespondent pas exactement à 4,9 et 0,1.
+Autre exemple,
+[17]:
+[17]:
+[18]:
+
+0.1 * 0.1 == 0.01
+False
+s = 0
+for k in range(100) :
+s = s +0.1
+print(s)
+
+[18]:
+
+9.99999999999998
+
+Les exercices suivants illustrent ces phénomènes.
+Exercice 4. Soit a ∈ R et b = a + 1. On définit la suite (xn )n⩾1 par :
+(
+x1 = 1
+xn+1 = bxn − a
+1. Prouver que pour tout n ⩾ 1, xn = 1 quelque soit la valeur de a choisie.
+2. Écrire une fonction f(a, n) qui retourne les n premiers termes de la suite (xn ).
+3. Tester la fonction avec a = 1 023,1 et n = 10.
+À votre avis, d’où vient le problème ?
+En réalité, le problème survient avec tous les nombres du type Nk = 22k − 0,9.
+4. Si k = 1, N1 = 3,1. Quelle est la valeur minimale de n qui fait apparaire le problème ?
+Exercice 5. Le problème suivant illustre le fait que la multiplication des flottants n’est pas commutative.
+On considère la suite définie par :
+yn+1 = yn + ayn (1 − yn )
+On souhaite calculer les 100 premiers termes de cette suite avec y0 = 12 et a = 3.
+1. Déterminer y100 en utilisant pour le calcul
+(a) l’expression yn+1 = (a + 1)yn − ayn2
+(b) l’expression yn+1 = (a + 1)yn − a(yn )yn
+Obtient-on le même résultat ?
+2. Écrire une fonction dif(a, n) qui retourne les différences successives entre les deux expressions et qui affiche
+le graphique correspond.
+Vous devez obtenir un graphique semblable à celui de la figure 1 ci-dessous.
+3. Écrire une fonction Yn(n) qui retourne le vecteur X contenant les 5 valeurs de yn calculées en utilisant les
+expressions formellement identiques :
+Info1 — R2.09
+Année 2025/2026
+
+Outils fondamentaux
+
+page 3/4
+
+(a) yn+1 = (a + 1)yn − ayn2
+(b) yn+1 = (a + 1)yn − a(yn )yn
+(c) yn+1 = ((a + 1) − ayn )yn
+(d) yn+1 = ayn + (1 − ayn )yn
+(e) yn+1 = yn + a(yn − yn2 )
+Qu’obtient-on pour n = 100 ?
+On peut alors se poser légitimement la question angoissante : « quelle est la vraie valeur de y100 ? »
+
+Figure 1 – Graphique des différences entre les deux expressions
+
+Info1 — R2.09
+Année 2025/2026
+
+Outils fondamentaux
+
+page 4/4
+
+
